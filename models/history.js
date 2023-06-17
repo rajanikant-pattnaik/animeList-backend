@@ -7,7 +7,7 @@ const historySchema=new mongoose.Schema({
     },
     animeId:{
         type:String,
-        unique:true
+        required:true
     },
     title:{
         type:String,
