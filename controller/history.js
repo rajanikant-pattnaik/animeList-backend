@@ -3,7 +3,7 @@ import { history } from "../models/history.js";
 export const getHistory=async(req,res)=>{
     try {
       const {userid}=req.body;
-      const allHistory=await history.find({userid});
+      const allHistory=await history.find({userid}).sort({createdAt:'desc'});
       res.status(200).json({
         success:true,
         message:"Data is shown",
@@ -25,7 +25,12 @@ export const addHistory = async (req, res) => {
     const {userid,animeId}=req.body;
     const getCard=await history.findOne({userid,animeId});
     if(!getCard){
-      const newcard=new history(req.body);
+      const historyd=req.body;
+      const create={
+        createdAt:Date.now()
+      }
+      const historyData={...historyd,...create};
+      const newcard=new history(historyData);
       await newcard.save();
      res.status(201).json({
        success: true,
@@ -33,7 +38,8 @@ export const addHistory = async (req, res) => {
      });
     }
     else{
-    getCard.createdAt=Date.now;
+    getCard.createdAt=Date.now();
+    await getCard.save();
     res.status(200).json({
       success: true,
       getCard
@@ -49,8 +55,8 @@ export const addHistory = async (req, res) => {
 
 export const deleteHistory=async(req,res)=>{
   try {
-    const {userid,animeId}=req.body;
-    const historyCard=await history.findOne({userid,animeId});
+    const {_id}=req.body;
+    const historyCard=await history.findById(_id);
     await historyCard.deleteOne();
     res.status(200).json({
       success: true,
